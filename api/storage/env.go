@@ -4,7 +4,7 @@ import (
 	"os"
 )
 
-// Envars struct holds all environment values
+// Envars struct holds all environment values for configuration
 type Envars struct {
 	Backend  string
 	Username string
