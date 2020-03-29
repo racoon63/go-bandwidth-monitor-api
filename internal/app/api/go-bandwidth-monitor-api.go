@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"log"
 	"net"
 	"net/http"
@@ -14,6 +15,43 @@ import (
 )
 
 type conf struct{}
+
+func getIP() (string, error) {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		log.Println(err)
+	}
+	for _, iface := range ifaces {
+		if iface.Flags&net.FlagUp == 0 {
+			continue
+		}
+		if iface.Flags&net.FlagLoopback != 0 {
+			continue
+		}
+		addrs, err := iface.Addrs()
+		if err != nil {
+			log.Println(err)
+		}
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+			if ip == nil || ip.IsLoopback() {
+				continue
+			}
+			ip = ip.To4()
+			if ip == nil {
+				continue
+			}
+			return ip.String(), nil
+		}
+	}
+	return "127.0.0.1", errors.New("Can not fetch IP address. Fallback to localhost address")
+}
 
 // Init checks if all conditions met to start the API.
 func Init() {
@@ -51,6 +89,8 @@ func Run() {
 	r.HandleFunc(dataItemPath, endpoints.GetItem).Methods("GET")
 	r.HandleFunc(dataItemValuePath, endpoints.GetItemValue).Methods("GET")
 
-	log.Print("Starting API on port 8080")
+	myIP, _ := getIP()
+
+	log.Print("Starting API on ", myIP, ":", "8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
