@@ -24,7 +24,7 @@ func Init() {
 	log.Print("Verify database connectivity...")
 	for {
 		log.Println("Trying to connect to database...")
-		_, err := net.Dial("tcp", conf.Address+conf.Port)
+		_, err := net.Dial("tcp", conf.Address+":"+conf.Port)
 		if err != nil {
 			log.Println(err)
 			log.Println("Could not reach database. Waiting 60 seconds and retry...")
