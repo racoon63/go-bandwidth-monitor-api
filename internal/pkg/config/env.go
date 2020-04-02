@@ -4,24 +4,48 @@ import (
 	"os"
 )
 
-// EnvVars struct holds all environment values for api configuration.
-type EnvVars struct {
-	Database string
+// ServiceConf holds the config values for the REST API service.
+type ServiceConf struct {
+	Address string
+	Port    string
+}
+
+// DBConf struct holds the config for the acces of the target database.
+type DBConf struct {
+	Type     string
 	Address  string
 	Port     string
 	Username string
 	Password string
 }
 
-// Read gets all necessary config values from environment variables and stores them in an EnvVars struct.
-func Read() *EnvVars {
-	var conf EnvVars
+// getEnv looks up if the environment variable is present and if yes returns the value. If not it returns default value.
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}
 
-	conf.Database = os.Getenv("DATABASE")
-	conf.Address = os.Getenv("ADDRESS")
-	conf.Port = os.Getenv("PORT")
-	conf.Username = os.Getenv("USERNAME")
-	conf.Password = os.Getenv("PASSWORD")
+// GetServiceConf fills the ServoiceConf struct with environemnt or default values if env vars are not present.
+func (sc *ServiceConf) GetServiceConf() {
+	// var sc ServiceConf
 
-	return &conf
+	sc.Address = getEnv("API_BIND", "0.0.0.0")
+	sc.Port = getEnv("API_PORT", "8080")
+
+	// return &sc
+}
+
+// GetDBConf gets all necessary config values from environment variables and stores them in an EnvVars struct.
+func (dbc *DBConf) GetDBConf() {
+	// var dbc DBConf
+
+	dbc.Type = getEnv("DB_TYPE", "")
+	dbc.Address = getEnv("DB_ADDRESS", "")
+	dbc.Port = getEnv("DB_PORT", "")
+	dbc.Username = getEnv("DB_USER", "")
+	dbc.Password = getEnv("DB_PWD", "")
+
+	// return &dbc
 }
