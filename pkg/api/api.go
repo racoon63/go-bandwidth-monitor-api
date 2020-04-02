@@ -6,9 +6,8 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/racoon63/go-bandwidth-monitor-api/internal/pkg/config"
-	"github.com/racoon63/go-bandwidth-monitor-api/internal/pkg/endpoints"
-	//"github.com/racoon63/go-bandwidth-monitor-api/internal/pkg/storage"
+	"github.com/racoon63/go-bandwidth-monitor-api/pkg/api/config"
+	"github.com/racoon63/go-bandwidth-monitor-api/pkg/api/endpoints"
 )
 
 // Run starts the API and handles the incoming requests.
@@ -19,15 +18,15 @@ func Run() {
 
 	apiPath := "/api/v1"
 	dataPath := apiPath + "/data"
-	dataItemPath := dataPath + "/{ts}"
-	dataItemValuePath := dataItemPath + "/{ping|download|upload}"
+	// dataItemPath := dataPath + "/{ts}"
+	// dataItemValuePath := dataItemPath + "/{ping|download|upload}"
 
 	r := mux.NewRouter()
 
 	r.HandleFunc(apiPath, endpoints.GetInfo).Methods("GET")
 	r.HandleFunc(dataPath, endpoints.GetAllData).Methods("GET")
-	r.HandleFunc(dataItemPath, endpoints.GetItem).Methods("GET")
-	r.HandleFunc(dataItemValuePath, endpoints.GetItemValue).Methods("GET")
+	// r.HandleFunc(dataItemPath, endpoints.GetItem).Methods("GET")
+	// r.HandleFunc(dataItemValuePath, endpoints.GetItemValue).Methods("GET")
 
 	log.Print("Starting API on ", sconf.Address, ":", sconf.Port)
 	log.Fatal(http.ListenAndServe(":"+sconf.Port, r))
